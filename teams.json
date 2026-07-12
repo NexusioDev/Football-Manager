@@ -1,10 +1,26 @@
 {
   "PSG": {
-    "attack": 16,
-    "defense": 10
+    "attack": 88,
+    "defense": 80
   },
   "Chelsea": {
-    "attack": 20,
-    "defense": 15
+    "attack": 85,
+    "defense": 76
+  },
+  "Bayern Muenchen": {
+    "attack": 92,
+    "defense": 88
+  },
+  "Barcelona": {
+    "attack": 82,
+    "defense": 80
+  },
+  "PSV Eindhoven": {
+    "attack": 75,
+    "defense": 73
+  },
+  "RB Salzburg": {
+    "attack": 66,
+    "defense": 65
   }
 }
