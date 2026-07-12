@@ -8,6 +8,12 @@ include_directories(nlohmann)
 add_executable(Football_Manager
         nlohmann/json.hpp
         main.cpp
+        Match.cpp
+        Match.hpp
+        Team.cpp
+        Team.hpp
+        Events.cpp
+        Events.hpp
 )
 
 configure_file(
