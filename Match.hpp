@@ -14,4 +14,7 @@ public:
     Match(Team home, Team away);
     void simulate();
     void printResult();
+
+    int getHomeGoals() const { return homeGoals; }
+    int getAwayGoals() const { return awayGoals; }
 };

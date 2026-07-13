@@ -1,0 +1,7 @@
+{
+  "name": "Champions League",
+  "teams": ["PSG", "Chelsea", "Bayern Muenchen", "Barcelona",
+    "PSV Eindhoven", "RB Salzburg", "SSC Neapel", "FC Bruegge",
+    "Galatasaray", "AS Monaco", "Sporting CP", "SL Benfica",
+    "Arsenal", "Juventus Turin", "Atalanta Bergamo", "Bayer Leverkusen"]
+}

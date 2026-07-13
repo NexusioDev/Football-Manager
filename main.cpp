@@ -8,6 +8,42 @@
 #include "nlohmann/json.hpp"
 #include "Team.hpp"
 #include "Match.hpp"
+#include "league.hpp"
+
+League loadLeague(nlohmann::json& teamsData, const std::string& leaguePath) {
+    std::ifstream file(leaguePath);
+    if (!file.is_open()) {
+        throw std::runtime_error("league.json nicht gefunden!");
+    }
+    nlohmann::json leagueData;
+    file >> leagueData;
+
+    std::vector<Team> teams;
+    for (const auto& name : leagueData["teams"]) {
+        teams.push_back(loadTeam(teamsData, name.get<std::string>()));
+    }
+    return League(teams);
+}
+
+void runLeagueMode(nlohmann::json& teamsData) {
+    League league = loadLeague(teamsData, "league.json");
+
+    std::cout << "\n1) Ganze Saison simulieren\n2) Spiel für Spiel\n3) Zurück\nChoice: ";
+    int mode; std::cin >> mode;
+
+    if (mode == 1) {
+        league.simulateAll();
+        league.printFixtures();
+        league.printTable();
+    } else if (mode == 2) {
+        while (!league.isFinished()) {
+            league.simulateNextFixture();
+            league.printTable();
+            std::cout << "\nWeiter mit Enter...";
+            std::cin.ignore(); std::cin.get();
+        }
+    }
+}
 
 int main() {
     srand(time(nullptr));
@@ -60,6 +96,10 @@ int main() {
             match.printResult();
         }
         else if (choice == 2) {
+            std::cout << "\n===== Teams List =====\n";
+            for (int i = 0; i < teamNames.size(); i++) {
+                std::cout << i + 1 << ". " << loadTeam(data, teamNames[i]).name << "\n";
+            }
             std::cout << "Team Nr.1 (Eine Zahl zwischen 1 bis " << teamNames.size() << ": ";
             int teamNo1; std::cin >> teamNo1; teamNo1--;
             std::cout << "Team Nr.2 (Eine Zahl zwischen 1 bis " << teamNames.size() << ": ";
@@ -77,6 +117,9 @@ int main() {
 
             match.simulate();
             match.printResult();
+        }
+        else if (choice == 3) {
+            runLeagueMode(data);
         }
     }
 

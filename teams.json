@@ -22,5 +22,45 @@
   "RB Salzburg": {
     "attack": 66,
     "defense": 65
+  },
+  "SSC Neapel": {
+    "attack": 78,
+    "defense": 73
+  },
+  "FC Bruegge": {
+    "attack": 74,
+    "defense": 75
+  },
+  "Galatasaray": {
+    "attack": 68,
+    "defense": 68
+  },
+  "AS Monaco": {
+    "attack": 77,
+    "defense": 80
+  },
+  "Sporting CP": {
+    "attack": 72,
+    "defense": 81
+  },
+  "SL Benfica": {
+    "attack": 79,
+    "defense": 75
+  },
+  "Arsenal": {
+    "attack": 82,
+    "defense": 89
+  },
+  "Juventus Turin": {
+    "attack": 78,
+    "defense": 81
+  },
+  "Atalanta Bergamo": {
+    "attack": 83,
+    "defense": 79
+  },
+  "Bayer Leverkusen": {
+    "attack": 74,
+    "defense": 76
   }
 }
