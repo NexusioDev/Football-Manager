@@ -11,6 +11,7 @@ private:
     int homePlayers = 11; int awayPlayers = 11;
     int homeYellowCards = 0; int awayYellowCards = 0;
     int extraTime = 0;
+    bool inExtraTime = false;
 
     std::mt19937 rng{std::random_device{}()};
     std::uniform_int_distribution<int> chance10{1, 10};
@@ -19,9 +20,9 @@ private:
 
 public:
     Match(Team home, Team away);
-    void simulate();
-    void simulateEvent(int m);
-    void processEvent(Team &home, Team &opponent, int &goals, int &homePlayers, int opponentPlayers, int &yellowCards, int minute);
+    void simulate(bool needWinner = false);
+    void simulateEvent(int m, int emin = 0);
+    void processEvent(Team &home, Team &opponent, int &goals, int &homePlayers, int opponentPlayers, int &yellowCards, int minute, int extraMinute = 0);
 
     void printResult();
 

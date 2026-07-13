@@ -16,6 +16,8 @@ add_executable(Football_Manager
         Events.hpp
         League.cpp
         League.hpp
+        Cup.cpp
+        Cup.hpp
 )
 
 configure_file(
@@ -26,5 +28,10 @@ configure_file(
 configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/league.json
         ${CMAKE_CURRENT_BINARY_DIR}/league.json
+        COPYONLY
+)
+configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/cup.json
+        ${CMAKE_CURRENT_BINARY_DIR}/cup.json
         COPYONLY
 )

@@ -9,6 +9,7 @@
 #include "Team.hpp"
 #include "Match.hpp"
 #include "league.hpp"
+#include "Cup.hpp"
 
 League loadLeague(nlohmann::json& teamsData, const std::string& leaguePath) {
     std::ifstream file(leaguePath);
@@ -67,6 +68,63 @@ void runLeagueMode(nlohmann::json& teamsData) {
     }
 }
 
+Cup loadCup(nlohmann::json& teamsData, const std::string& cupPath) {
+    std::ifstream file(cupPath);
+    if (!file.is_open()) {
+        throw std::runtime_error("cup.json nicht gefunden!");
+    }
+    nlohmann::json cupData;
+    file >> cupData;
+
+    std::vector<std::string> cupNames;
+
+    for (auto& league : cupData.items()) {
+        cupNames.push_back(league.key());
+    }
+
+    std::cout << "\n=== Pokale ===\n";
+    for (size_t i = 0; i < cupNames.size(); i++) {
+        std::cout << i + 1 << ") " << cupNames[i] << '\n';
+    }
+
+    std::cout << "Pokal wählen: ";
+    int choice;
+    std::cin >> choice;
+
+    if (choice < 1 || choice > cupNames.size()) {
+        throw std::runtime_error("Ungültige Auswahl!");
+    }
+
+    std::string selectedLeague = cupNames[choice - 1];
+
+    std::vector<Team> teams;
+    for (const auto& name : cupData[selectedLeague]["teams"]) {
+        teams.push_back(loadTeam(teamsData, name.get<std::string>()));
+    }
+
+    return Cup(teams);
+}
+
+void runCupMode(nlohmann::json& teamsData) {
+    Cup cup = loadCup(teamsData, "cup.json");
+
+    std::cout << "\n1) Ganzen Pokal simulieren\n2) Spiel für Spiel\n3) Zurück\nChoice: ";
+    int mode; std::cin >> mode;
+
+    if (mode == 1) {
+        cup.simulateAll();
+        cup.printCupFixtures();
+        //cup.printTable();
+    } else if (mode == 2) {
+        while (!cup.isFinished()) {
+            cup.simulateNextFixture();
+            //cup.printTable();
+            std::cout << "\nWeiter mit Enter...";
+            std::cin.ignore(); std::cin.get();
+        }
+    }
+}
+
 int main() {
     srand(time(nullptr));
 
@@ -97,11 +155,12 @@ int main() {
         << "1) Quick Match (random teams)\n"
         << "2) Custom Match (pick teams)\n"
         << "3) League Mode\n"
-        << "4) Exit\n"
+        << "4) Cup Mode\n"
+        << "5) Exit\n"
         << "Choice: ";
         int choice; std::cin >> choice;
-        if (choice == 4) break;
-        else if (choice == 1) {
+        if (choice == 5) break;
+        if (choice == 1) {
             int random1 = rand() % teamNames.size();
             int random2 = rand() % teamNames.size();
 
@@ -142,6 +201,9 @@ int main() {
         }
         else if (choice == 3) {
             runLeagueMode(data);
+        }
+        else if (choice == 4) {
+            runCupMode(data);
         }
     }
 
