@@ -36,7 +36,44 @@ void Match::simulate(bool needWinner) {
             inExtraTime = true;
             simulateEvent(120,e);
         }
-        //TODO: Elfmeter schießen hinzufügen
+        if (homeGoals == awayGoals) {
+            for (int m = 1; m <= 5; m++) {
+                if (penaltyShoot(rng) != 1) {
+                    homeGoals++;
+                    penaltyHomeGoals++;
+                    PenaltyShootoutGoalEvent(homeTeam.name, penaltyHomeGoals, penaltyAwayGoals);
+                }
+                else {
+                    PenaltyShootoutMissEvent(homeTeam.name, penaltyHomeGoals, penaltyAwayGoals);
+                }
+                if (penaltyShoot(rng) != 1) {
+                    awayGoals++;
+                    penaltyAwayGoals++;
+                    PenaltyShootoutGoalEvent(awayTeam.name, penaltyHomeGoals, penaltyAwayGoals);
+                }
+                else {
+                    PenaltyShootoutMissEvent(awayTeam.name, penaltyHomeGoals, penaltyAwayGoals);
+                }
+            }
+            while (homeGoals == awayGoals) {
+                if (penaltyShoot(rng) != 1) {
+                    homeGoals++;
+                    penaltyHomeGoals++;
+                    PenaltyShootoutGoalEvent(homeTeam.name, penaltyHomeGoals, penaltyAwayGoals);
+                }
+                else {
+                    PenaltyShootoutMissEvent(homeTeam.name, penaltyHomeGoals, penaltyAwayGoals);
+                }
+                if (penaltyShoot(rng) != 1) {
+                    awayGoals++;
+                    penaltyAwayGoals++;
+                    PenaltyShootoutGoalEvent(awayTeam.name, penaltyHomeGoals, penaltyAwayGoals);
+                }
+                else {
+                    PenaltyShootoutMissEvent(awayTeam.name, penaltyHomeGoals, penaltyAwayGoals);
+                }
+            }
+        }
     }
 }
 

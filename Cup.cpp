@@ -34,9 +34,6 @@ void Cup::updateStanding(const CupFixture& f, Team home, Team away) {
     else if (f.homeGoals < f.awayGoals) {
         winners.push_back(away);
     }
-    else if (f.homeGoals == f.awayGoals) {
-        winners.push_back(home);
-    }
 
     if (nextFixtureIndex >= fixtures.size()) {
         teams = winners;
@@ -75,7 +72,7 @@ void Cup::simulateAll() {
 }
 
 bool Cup::isFinished() const {
-    return nextFixtureIndex >= fixtures.size();
+    return teams.size() == 1;
 }
 
 /*void Cup::printTable() const {
