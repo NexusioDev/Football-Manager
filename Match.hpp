@@ -1,5 +1,6 @@
 #pragma once
 
+#include <random>
 #include "Team.hpp"
 
 class Match {
@@ -9,10 +10,19 @@ private:
     int homeGoals = 0; int awayGoals = 0;
     int homePlayers = 11; int awayPlayers = 11;
     int homeYellowCards = 0; int awayYellowCards = 0;
+    int extraTime = 0;
+
+    std::mt19937 rng{std::random_device{}()};
+    std::uniform_int_distribution<int> chance10{1, 10};
+    std::uniform_int_distribution<int> coinFlip{1, 2};
+    std::uniform_int_distribution<int> teamFactor{-15, 15};
 
 public:
     Match(Team home, Team away);
     void simulate();
+    void simulateEvent(int m);
+    void processEvent(Team &home, Team &opponent, int &goals, int &homePlayers, int opponentPlayers, int &yellowCards, int minute);
+
     void printResult();
 
     int getHomeGoals() const { return homeGoals; }

@@ -30,5 +30,9 @@
   "SC Paderborn 07": {"attack": 69,"defense": 65},
   "SV 07 Elversberg": {"attack": 70,"defense": 67},
   "VfB Stuttgart": {"attack": 78,"defense": 76},
-  "Werder Bremen": {"attack": 73,"defense": 70}
+  "Werder Bremen": {"attack": 73,"defense": 70},
+  "Slavia Prag": {"attack": 76,"defense": 73},
+  "FC Kopenhagen": {"attack": 78,"defense": 74},
+  "FC Villarreal": {"attack": 77,"defense": 72},
+  "Ajax Amsterdam": {"attack": 75,"defense": 74}
 }
