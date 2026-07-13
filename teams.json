@@ -1,66 +1,34 @@
 {
-  "PSG": {
-    "attack": 88,
-    "defense": 80
-  },
-  "Chelsea": {
-    "attack": 85,
-    "defense": 76
-  },
-  "Bayern Muenchen": {
-    "attack": 92,
-    "defense": 88
-  },
-  "Barcelona": {
-    "attack": 82,
-    "defense": 80
-  },
-  "PSV Eindhoven": {
-    "attack": 75,
-    "defense": 73
-  },
-  "RB Salzburg": {
-    "attack": 66,
-    "defense": 65
-  },
-  "SSC Neapel": {
-    "attack": 78,
-    "defense": 73
-  },
-  "FC Bruegge": {
-    "attack": 74,
-    "defense": 75
-  },
-  "Galatasaray": {
-    "attack": 68,
-    "defense": 68
-  },
-  "AS Monaco": {
-    "attack": 77,
-    "defense": 80
-  },
-  "Sporting CP": {
-    "attack": 72,
-    "defense": 81
-  },
-  "SL Benfica": {
-    "attack": 79,
-    "defense": 75
-  },
-  "Arsenal": {
-    "attack": 82,
-    "defense": 89
-  },
-  "Juventus Turin": {
-    "attack": 78,
-    "defense": 81
-  },
-  "Atalanta Bergamo": {
-    "attack": 83,
-    "defense": 79
-  },
-  "Bayer Leverkusen": {
-    "attack": 74,
-    "defense": 76
-  }
+  "PSG": { "attack": 88, "defense": 80 },
+  "Chelsea": { "attack": 85, "defense": 76 },
+  "Bayern Muenchen": { "attack": 90, "defense": 88 },
+  "Barcelona": { "attack": 82, "defense": 80 },
+  "PSV Eindhoven": { "attack": 75, "defense": 73 },
+  "RB Salzburg": {"attack": 66, "defense": 65},
+  "SSC Neapel": {"attack": 78, "defense": 73},
+  "FC Bruegge": {"attack": 74, "defense": 75},
+  "Galatasaray": {"attack": 68, "defense": 68},
+  "AS Monaco": {"attack": 77, "defense": 80},
+  "Sporting CP": {"attack": 72, "defense": 81},
+  "SL Benfica": {"attack": 79, "defense": 75},
+  "Arsenal": {"attack": 82, "defense": 89},
+  "Juventus Turin": {"attack": 78, "defense": 81},
+  "Atalanta Bergamo": {"attack": 83, "defense": 79},
+  "Bayer Leverkusen": {"attack": 77, "defense": 76},
+  "Borussia Dortmund": {"attack": 84, "defense": 82},
+  "TSG Hoffenheim": {"attack": 81, "defense": 81},
+  "RB Leipzig": {"attack": 78, "defense": 77},
+  "Eintracht Frankfurt": {"attack": 78, "defense": 76},
+  "1. FC Koeln": {"attack": 75,"defense": 74},
+  "Union Berlin": {"attack": 75,"defense": 75},
+  "Mainz 05": {"attack": 76,"defense": 73},
+  "Moenchengladbach": {"attack": 75,"defense": 73},
+  "FC Augsburg": {"attack": 74,"defense": 74},
+  "FC Schalke 04": {"attack": 72,"defense": 69},
+  "Hamburger SV": {"attack": 76,"defense": 72},
+  "SC Freiburg": {"attack": 78,"defense": 74},
+  "SC Paderborn 07": {"attack": 69,"defense": 65},
+  "SV 07 Elversberg": {"attack": 70,"defense": 67},
+  "VfB Stuttgart": {"attack": 78,"defense": 76},
+  "Werder Bremen": {"attack": 73,"defense": 70}
 }

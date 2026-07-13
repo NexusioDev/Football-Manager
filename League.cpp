@@ -85,7 +85,7 @@ void League::printTable() const {
     std::cout << std::left << std::setw(4) << "Pos" << std::setw(20) << "Team"
                << std::right << std::setw(4) << "Sp"
                << std::setw(4) << "S" << std::setw(4) << "U" << std::setw(4) << "N"
-               << std::setw(6) << "Tore" << std::setw(7) << "Pkt" << "\n";
+               << std::setw(7) << "Tore" << std::setw(6) << "Pkt" << "\n";
 
     for (const auto& s : sorted) {
         std::string goals = std::to_string(s.gf) + ":" + std::to_string(s.ga);
@@ -93,7 +93,7 @@ void League::printTable() const {
         std::cout << std::left << std::setw(4) << s.pos <<std::setw(20) << s.name
                    << std::right << std::setw(4) << s.played
                    << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
-                   << std::setw(7) << goals << std::right << std::setw(5) << s.points() << "\n";
+                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\n";
     }
 }
 
@@ -104,4 +104,21 @@ void League::printFixtures() const {
         if (f.played) std::cout << "  ->  " << f.homeGoals << ":" << f.awayGoals;
         std::cout << "\n";
     }
+}
+
+void League::printTableFixtures() const {
+    std::cout << "\n===== Spielplan =====\n";
+    std::string oldTeam = "/";
+
+    for (const auto& f : fixtures) {
+        if (f.home != oldTeam) {
+            std::cout << "\n" << std::left << std::setw(20) << f.home << ":";
+            if (f.played) std::cout << " -> " << f.homeGoals << ":" << f.awayGoals;
+        }
+        else if (f.home == oldTeam) {
+            if (f.played) std::cout << "; " << f.homeGoals << ":" << f.awayGoals;
+        }
+        oldTeam = f.home;
+    }
+    std::cout << "\n";
 }

@@ -34,6 +34,7 @@ public:
     bool isFinished() const;
     void printTable() const;
     void printFixtures() const;
+    void printTableFixtures() const;
 
 private:
     std::vector<Team> teams;

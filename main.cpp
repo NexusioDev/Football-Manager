@@ -18,10 +18,32 @@ League loadLeague(nlohmann::json& teamsData, const std::string& leaguePath) {
     nlohmann::json leagueData;
     file >> leagueData;
 
+    std::vector<std::string> leagueNames;
+
+    for (auto& league : leagueData.items()) {
+        leagueNames.push_back(league.key());
+    }
+
+    std::cout << "\n=== Ligen ===\n";
+    for (size_t i = 0; i < leagueNames.size(); i++) {
+        std::cout << i + 1 << ") " << leagueNames[i] << '\n';
+    }
+
+    std::cout << "Liga wählen: ";
+    int choice;
+    std::cin >> choice;
+
+    if (choice < 1 || choice > leagueNames.size()) {
+        throw std::runtime_error("Ungültige Auswahl!");
+    }
+
+    std::string selectedLeague = leagueNames[choice - 1];
+
     std::vector<Team> teams;
-    for (const auto& name : leagueData["teams"]) {
+    for (const auto& name : leagueData[selectedLeague]["teams"]) {
         teams.push_back(loadTeam(teamsData, name.get<std::string>()));
     }
+
     return League(teams);
 }
 
@@ -33,7 +55,7 @@ void runLeagueMode(nlohmann::json& teamsData) {
 
     if (mode == 1) {
         league.simulateAll();
-        league.printFixtures();
+        league.printTableFixtures();
         league.printTable();
     } else if (mode == 2) {
         while (!league.isFinished()) {

@@ -21,6 +21,8 @@ void Match::simulate() {
     std::uniform_int_distribution<int> coinFlip(1, 2);
     std::uniform_int_distribution<int> teamFactor(-15, 15);
 
+    std::cout << "\n===== Match Ticker =====\n";
+
     for (int m = 1; m < 91; m++) {
         int event = chance10(rng); // 10% Chance auf irgendein Event
         if (event == 1) {
