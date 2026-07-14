@@ -3,12 +3,12 @@
     "teams": [
       "PSG",
       "Chelsea",
-      "Bayern Muenchen",
+      "Bayern München",
       "Barcelona",
       "PSV Eindhoven",
       "RB Salzburg",
       "SSC Neapel",
-      "FC Bruegge",
+      "FC Brügge",
       "Galatasaray",
       "AS Monaco",
       "Sporting CP",
@@ -25,20 +25,21 @@
       "FC Kopenhagen",
       "FC Villarreal",
       "Ajax Amsterdam"
-    ]
+    ],
+    "amountRelegationTeams": 12
   },
   "Bundesliga": {
     "teams": [
-      "Bayern Muenchen",
+      "Bayern München",
       "Bayer Leverkusen",
       "Borussia Dortmund",
       "TSG Hoffenheim",
       "RB Leipzig",
       "Eintracht Frankfurt",
-      "1. FC Koeln",
+      "1. FC Köln",
       "Union Berlin",
       "Mainz 05",
-      "Moenchengladbach",
+      "Mönchengladbach",
       "FC Augsburg",
       "FC Schalke 04",
       "Hamburger SV",
@@ -47,6 +48,11 @@
       "SV 07 Elversberg",
       "VfB Stuttgart",
       "Werder Bremen"
-    ]
+    ],
+    "amountChampionsLeagueTeams": 5,
+    "amountEuropaLeagueTeams": 1,
+    "amountConferenceLeagueTeams": 1,
+    "amountRelegationPlayoffTeams": 1,
+    "amountRelegationTeams": 2
   }
 }

@@ -25,7 +25,7 @@ struct Standing {
 
 class League {
 public:
-    explicit League(std::vector<Team> teams);
+    explicit League(std::vector<Team> teams, int amountRelegationTeams, int amountRelPlayoffTeams = 0, int amountClTeams = 0, int amountElTeams = 0, int amountCflTeams = 0);
 
     void generateFixtures();       // Hin- und Rückrunde
     void simulateNextFixture();    // ein einzelnes Spiel
@@ -41,6 +41,11 @@ private:
     std::vector<Fixture> fixtures;
     std::map<std::string, Standing> table;
     size_t nextFixtureIndex = 0;
+    int amountRelegationTeams;
+    int amountRelegationPlayoffTeams;
+    int amountChampionsLeagueTeams;
+    int amountEuropaLeagueTeams;
+    int amountConferenceLeagueTeams;
 
     void updateStanding(const Fixture& f);
 };

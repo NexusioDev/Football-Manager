@@ -20,7 +20,8 @@ void Cup::generateFixtures() {
     }
     nextFixtureIndex = 0;
     for (int i = 0; i < fixtures.size(); ++i) {
-        std::cout << fixtures[i].home << " vs. " << fixtures[i].away << "\n";
+        std::cout << "\n" <<fixtures[i].home << " vs. " << fixtures[i].away;
+        if (i + 1 >= fixtures.size()) std::cout << "\n";
     }
 }
 

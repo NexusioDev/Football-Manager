@@ -4,10 +4,15 @@
 #include <algorithm>
 #include <iomanip>
 
-League::League(std::vector<Team> teamsIn) : teams(std::move(teamsIn)) {
+League::League(std::vector<Team> teamsIn, int amountRelegated, int amountRelPlayoff, int amountCl, int amountEl, int amountCfl) : teams(std::move(teamsIn)) {
     for (const auto& t : teams) {
         table[t.name] = Standing{t.name};
     }
+    amountRelegationTeams = amountRelegated - 1;
+    amountRelegationPlayoffTeams = amountRelPlayoff;
+    amountChampionsLeagueTeams = amountCl;
+    amountEuropaLeagueTeams = amountEl;
+    amountConferenceLeagueTeams = amountCfl;
     generateFixtures();
 }
 
@@ -90,10 +95,44 @@ void League::printTable() const {
     for (const auto& s : sorted) {
         std::string goals = std::to_string(s.gf) + ":" + std::to_string(s.ga);
 
-        std::cout << std::left << std::setw(4) << s.pos <<std::setw(20) << s.name
+        size_t len = 0;
+        for (unsigned char c : s.name)
+            if ((c & 0xC0) != 0x80)
+                ++len;
+
+        int width = 20 + (s.name.size() - len);
+
+        if (s.pos >= sorted.size() - amountRelegationTeams) {
+            std::cout << "\033[41m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
                    << std::right << std::setw(4) << s.played
                    << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
-                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\n";
+                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
+        } else if (s.pos == sorted.size() - amountRelegationTeams - amountEuropaLeagueTeams) {
+            std::cout << "\033[43m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
+                   << std::right << std::setw(4) << s.played
+                   << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
+                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
+        } else if (s.pos <= sorted.size() - (sorted.size() - amountChampionsLeagueTeams)) {
+            std::cout << "\033[46m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
+                   << std::right << std::setw(4) << s.played
+                   << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
+                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
+        } else if (s.pos <= sorted.size() - (sorted.size() - amountChampionsLeagueTeams - amountEuropaLeagueTeams)) {
+            std::cout << "\033[0;39;48;5;166m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
+                   << std::right << std::setw(4) << s.played
+                   << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
+                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
+        } else if (s.pos <= sorted.size() - (sorted.size() - amountChampionsLeagueTeams - amountEuropaLeagueTeams - amountConferenceLeagueTeams)) {
+            std::cout << "\033[42m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
+                   << std::right << std::setw(4) << s.played
+                   << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
+                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
+        }else {
+            std::cout << std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
+                       << std::right << std::setw(4) << s.played
+                       << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
+                       << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\n";
+        }
     }
 }
 

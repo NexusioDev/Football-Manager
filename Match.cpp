@@ -16,7 +16,7 @@ void Match::printResult()
 }
 //TODO: Verletzungen hinzufügen
 void Match::simulate(bool needWinner) {
-    std::cout << "\n===== Match Ticker =====\n";
+    std::cout << "\n===== Match Ticker: " << homeTeam.name << " vs " << awayTeam.name << " =====\n";
     extraTime = false;
     for (int m = 1; m < 91; m++) {
         simulateEvent(m);

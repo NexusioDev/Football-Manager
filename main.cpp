@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <ctime>
 #include <vector>
+#include <windows.h>
 
 #include "nlohmann/json.hpp"
 #include "Team.hpp"
@@ -45,7 +46,13 @@ League loadLeague(nlohmann::json& teamsData, const std::string& leaguePath) {
         teams.push_back(loadTeam(teamsData, name.get<std::string>()));
     }
 
-    return League(teams);
+    int amountRelegationTeams = leagueData[selectedLeague]["amountRelegationTeams"];
+    int amountRelPlayoffTeams = leagueData[selectedLeague].value("amountRelegationPlayoffTeams", 0);
+    int amountCl = leagueData[selectedLeague].value("amountChampionsLeagueTeams", 0);
+    int amountEl = leagueData[selectedLeague].value("amountEuropaLeagueTeams", 0);
+    int amountCfl = leagueData[selectedLeague].value("amountConferenceLeagueTeams", 0);
+
+    return League(teams, amountRelegationTeams, amountRelPlayoffTeams, amountCl, amountEl, amountCfl);
 }
 
 void runLeagueMode(nlohmann::json& teamsData) {
@@ -126,6 +133,7 @@ void runCupMode(nlohmann::json& teamsData) {
 }
 
 int main() {
+    SetConsoleOutputCP(CP_UTF8);
     srand(time(nullptr));
 
     auto lang = "Football Manager";
