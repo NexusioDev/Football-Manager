@@ -55,6 +55,59 @@
     "amountRelegationPlayoffTeams": 1,
     "amountRelegationTeams": 2
   },
+  "2. Bundesliga": {
+    "teams": [
+      "1. FC Heidenheim",
+      "1. FC Kaiserslautern",
+      "FC Magdeburg",
+      "1. FC Nürnberg",
+      "Arminia Bielefeld",
+      "Dynamo Dresden",
+      "Eintracht Braunschweig",
+      "Energie Cottbus",
+      "FC St. Pauli",
+      "Hannover 96",
+      "Hertha BSC",
+      "Holstein Kiel",
+      "Karlsruher SC",
+      "SpVgg Greuther Fürth",
+      "SV Darmstadt 98",
+      "VfL Bochum",
+      "VfL Osnabrück",
+      "VfL Wolfsburg"
+    ],
+    "amountEuropaLeagueTeams": 2,
+    "amountConferenceLeagueTeams": 1,
+    "amountRelegationPlayoffTeams": 1,
+    "amountRelegationTeams": 2
+  },
+  "3. Liga": {
+    "teams": [
+      "1. FC Saarbrücken",
+      "TSG Hoffenheim II",
+      "Alemannia Aachen",
+      "FC Ingolstadt 04",
+      "Fortuna Düsseldorf",
+      "Fortuna Köln",
+      "FC Hansa Rostock",
+      "SSV Jahn Regensburg",
+      "MSV Duisburg",
+      "Preußen Münster",
+      "Rot-Weiss Essen",
+      "SC Verl",
+      "SG Sonnenhof Großaspach",
+      "SV Meppen",
+      "SV Wehen Wiesbaden",
+      "TSV Havelse",
+      "VfB Stuttgart II",
+      "Viktoria Köln",
+      "SV Waldhof Mannheim",
+      "Würzburger Kickers"
+    ],
+    "amountEuropaLeagueTeams": 2,
+    "amountConferenceLeagueTeams": 1,
+    "amountRelegationTeams": 4
+  },
   "Premier League": {
     "teams": [
       "Chelsea",

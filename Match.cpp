@@ -9,7 +9,7 @@ Match::Match(Team home, Team away)
     awayTeam = away;
 }
 
-void Match::printResult()
+void Match::printResult() const
 {
     std::cout << "\n===== Match Result =====\n"
         << homeTeam.name << " " << homeGoals << " : " << awayGoals << " " << awayTeam.name << "\n";
@@ -104,7 +104,14 @@ void Match::processEvent(Team& team, Team& opponent, int& goals, int& players, i
         YellowCardEvent(minute, team.name, inExtraTime, eMinute);
     }
     else if (eventType > 3) { // 4-10 Torchance
-        if (team.attack * players / 11 > opponent.defense * opponentPlayers / 11 + teamFactor(rng)) {
+        double attackStr = team.attack * (players / 11.0);
+        double defStr = opponent.defense * (opponentPlayers / 11.0);
+        double isHome = (&team == &homeTeam) ? homeAdv : 1.0;
+
+        double xGPerShot = baseXG * pow(attackStr / defStr,exponent) * isHome + flukeXG;
+        bool isGoal = (prob(rng) < xGPerShot);
+
+        if (isGoal) {
             goals++;
             GoalEvent(minute, team.name, inExtraTime, eMinute);
         }

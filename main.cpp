@@ -41,6 +41,14 @@ League loadLeague(nlohmann::json& teamsData, const std::string& leaguePath) {
 
     std::string selectedLeague = leagueNames[choice - 1];
 
+    // Sicherheitscheck: existieren alle Teams in teams.json?
+    for (const auto& name : leagueData[selectedLeague]["teams"]) {
+        std::string t = name.get<std::string>();
+        if (!teamsData.contains(t)) {
+            throw std::runtime_error("Team \"" + t + "\" (Liga \"" + selectedLeague + "\") fehlt in teams.json – Tippfehler?");
+        }
+    }
+
     std::vector<Team> teams;
     for (const auto& name : leagueData[selectedLeague]["teams"]) {
         teams.push_back(loadTeam(teamsData, name.get<std::string>()));
@@ -155,6 +163,9 @@ int main() {
     std::vector<std::string> teamNames;
 
     for (auto& team : data.items()) {
+        if (team.key().rfind("_", 0) == 0) {
+            continue;
+        }
         teamNames.push_back(team.key());
     }
 

@@ -14,11 +14,18 @@ private:
     int extraTime = 0;
     bool inExtraTime = false;
 
+    double baseXG = 0.28;
+    double exponent = 1.9;
+    double homeAdv = 1.15;
+    double flukeXG = 0.012;
+
     std::mt19937 rng{std::random_device{}()};
     std::uniform_int_distribution<int> chance10{1, 10};
     std::uniform_int_distribution<int> coinFlip{1, 2};
     std::uniform_int_distribution<int> teamFactor{-15, 15};
     std::uniform_int_distribution<int> penaltyShoot{1, 5};
+
+    std::uniform_real_distribution<double> prob{0.0, 1.0};
 
 public:
     Match(Team home, Team away);
@@ -26,7 +33,7 @@ public:
     void simulateEvent(int m, int emin = 0);
     void processEvent(Team &home, Team &opponent, int &goals, int &homePlayers, int opponentPlayers, int &yellowCards, int minute, int extraMinute = 0);
 
-    void printResult();
+    void printResult() const;
 
     int getHomeGoals() const { return homeGoals; }
     int getAwayGoals() const { return awayGoals; }

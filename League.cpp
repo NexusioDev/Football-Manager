@@ -47,8 +47,11 @@ void League::simulateNextFixture() {
     Fixture& f = fixtures[nextFixtureIndex];
 
     auto findTeam = [this](const std::string& name) {
-        return *std::find_if(teams.begin(), teams.end(),
-            [&](const Team& t) { return t.name == name; });
+        auto it = std::find_if(teams.begin(), teams.end(), [&](const Team& t) {return t.name == name;});
+        if (it == teams.end()) {
+            throw std::runtime_error("Team \"" + name + "\" not found");
+        }
+        return *it;
     };
 
     Match match(findTeam(f.home), findTeam(f.away));
@@ -87,7 +90,7 @@ void League::printTable() const {
     }
 
     std::cout << "\n===== Tabelle =====\n";
-    std::cout << std::left << std::setw(4) << "Pos" << std::setw(20) << "Team"
+    std::cout << std::left << std::setw(4) << "Pos" << std::setw(28) << "Team"
                << std::right << std::setw(4) << "Sp"
                << std::setw(4) << "S" << std::setw(4) << "U" << std::setw(4) << "N"
                << std::setw(7) << "Tore" << std::setw(6) << "Pkt" << "\n";
@@ -100,14 +103,14 @@ void League::printTable() const {
             if ((c & 0xC0) != 0x80)
                 ++len;
 
-        int width = 20 + (s.name.size() - len);
+        int width = 28 + (s.name.size() - len);
 
         if (s.pos >= sorted.size() - amountRelegationTeams) {
             std::cout << "\033[41m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
                    << std::right << std::setw(4) << s.played
                    << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
                    << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
-        } else if (s.pos == sorted.size() - amountRelegationTeams - amountRelegationPlayoffTeams) {
+        } else if (amountRelegationPlayoffTeams > 0 && s.pos == sorted.size() - amountRelegationTeams - amountRelegationPlayoffTeams) {
             std::cout << "\033[43m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
                    << std::right << std::setw(4) << s.played
                    << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
