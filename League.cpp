@@ -107,22 +107,22 @@ void League::printTable() const {
                    << std::right << std::setw(4) << s.played
                    << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
                    << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
-        } else if (s.pos == sorted.size() - amountRelegationTeams - amountEuropaLeagueTeams) {
+        } else if (s.pos == sorted.size() - amountRelegationTeams - amountRelegationPlayoffTeams) {
             std::cout << "\033[43m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
                    << std::right << std::setw(4) << s.played
                    << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
                    << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
-        } else if (s.pos <= sorted.size() - (sorted.size() - amountChampionsLeagueTeams)) {
+        } else if (s.pos <= amountChampionsLeagueTeams) {
             std::cout << "\033[46m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
                    << std::right << std::setw(4) << s.played
                    << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
                    << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
-        } else if (s.pos <= sorted.size() - (sorted.size() - amountChampionsLeagueTeams - amountEuropaLeagueTeams)) {
+        } else if (s.pos <= amountChampionsLeagueTeams + amountEuropaLeagueTeams) {
             std::cout << "\033[0;39;48;5;166m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
                    << std::right << std::setw(4) << s.played
                    << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
                    << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
-        } else if (s.pos <= sorted.size() - (sorted.size() - amountChampionsLeagueTeams - amountEuropaLeagueTeams - amountConferenceLeagueTeams)) {
+        } else if (s.pos <= amountChampionsLeagueTeams + amountEuropaLeagueTeams + amountConferenceLeagueTeams) {
             std::cout << "\033[42m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
                    << std::right << std::setw(4) << s.played
                    << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost

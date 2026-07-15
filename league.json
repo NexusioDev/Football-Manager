@@ -54,5 +54,33 @@
     "amountConferenceLeagueTeams": 1,
     "amountRelegationPlayoffTeams": 1,
     "amountRelegationTeams": 2
+  },
+  "Premier League": {
+    "teams": [
+      "Chelsea",
+      "Arsenal",
+      "Tottenham",
+      "Liverpool",
+      "FC Everton",
+      "Brighton",
+      "Crystal Palace",
+      "FC Fulham",
+      "Manchester United",
+      "Manchester City",
+      "Aston Villa",
+      "Sunderland",
+      "Bournemouth",
+      "Newcastle United",
+      "Leeds United",
+      "Ipswich Town",
+      "Hull City",
+      "Coventry City",
+      "Nottingham Forest",
+      "Brentford"
+    ],
+    "amountChampionsLeagueTeams": 5,
+    "amountEuropaLeagueTeams": 2,
+    "amountConferenceLeagueTeams": 1,
+    "amountRelegationTeams": 3
   }
 }
