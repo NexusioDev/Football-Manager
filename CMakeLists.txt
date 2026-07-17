@@ -21,17 +21,17 @@ add_executable(Football_Manager
 )
 
 configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/teams.json
-        ${CMAKE_CURRENT_BINARY_DIR}/teams.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/database/teams.json
+        ${CMAKE_CURRENT_BINARY_DIR}/database/teams.json
         COPYONLY
 )
 configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/league.json
-        ${CMAKE_CURRENT_BINARY_DIR}/league.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/database/league.json
+        ${CMAKE_CURRENT_BINARY_DIR}/database/league.json
         COPYONLY
 )
 configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/cup.json
-        ${CMAKE_CURRENT_BINARY_DIR}/cup.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/database/cup.json
+        ${CMAKE_CURRENT_BINARY_DIR}/database/cup.json
         COPYONLY
 )

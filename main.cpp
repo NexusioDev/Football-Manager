@@ -64,7 +64,7 @@ League loadLeague(nlohmann::json& teamsData, const std::string& leaguePath) {
 }
 
 void runLeagueMode(nlohmann::json& teamsData) {
-    League league = loadLeague(teamsData, "league.json");
+    League league = loadLeague(teamsData, "database/league.json");
 
     std::cout << "\n1) Ganze Saison simulieren\n2) Spiel für Spiel\n3) Zurück\nChoice: ";
     int mode; std::cin >> mode;
@@ -121,7 +121,7 @@ Cup loadCup(nlohmann::json& teamsData, const std::string& cupPath) {
 }
 
 void runCupMode(nlohmann::json& teamsData) {
-    Cup cup = loadCup(teamsData, "cup.json");
+    Cup cup = loadCup(teamsData, "database/cup.json");
 
     std::cout << "\n1) Ganzen Pokal simulieren\n2) Spiel für Spiel\n3) Zurück\nChoice: ";
     int mode; std::cin >> mode;
@@ -151,7 +151,7 @@ int main() {
           << std::filesystem::current_path() << "\n"
           << std::endl;
 
-    std::ifstream file("teams.json");
+    std::ifstream file("database/teams.json");
     if (!file.is_open()) {
         std::cout << "Fehler: teams.json nicht gefunden!" << std::endl;
         return 1;
