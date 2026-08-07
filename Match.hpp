@@ -1,6 +1,7 @@
 #pragma once
 
 #include <random>
+#include <string>
 #include "Team.hpp"
 
 class Match {
@@ -13,6 +14,7 @@ private:
     int homeYellowCards = 0; int awayYellowCards = 0;
     int extraTime = 0;
     bool inExtraTime = false;
+    bool decidedByPenalties = false;
 
     double baseXG = 0.28;
     double exponent = 1.9;
@@ -35,6 +37,10 @@ public:
 
     void printResult() const;
 
+    std::string winner() const;
     int getHomeGoals() const { return homeGoals; }
     int getAwayGoals() const { return awayGoals; }
+    bool decidedByPenaltiesResult() const { return decidedByPenalties; }
+    int getPenaltyHomeGoals() const { return penaltyHomeGoals; }
+    int getPenaltyAwayGoals() const { return penaltyAwayGoals; }
 };

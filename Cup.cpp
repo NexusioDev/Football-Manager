@@ -25,16 +25,17 @@ void Cup::generateFixtures() {
     }
 }
 
-void Cup::updateStanding(const CupFixture& f, Team home, Team away) {
+void Cup::updateStanding(const CupFixture& f, Team winner) {
     /*CupStanding& home = table[f.home];
     CupStanding& away = table[f.away];*/
 
-    if (f.homeGoals > f.awayGoals) {
+    /*if (f.homeGoals > f.awayGoals) {
         winners.push_back(home);
     }
     else if (f.homeGoals < f.awayGoals) {
         winners.push_back(away);
-    }
+    }*/
+    winners.push_back(winner);
 
     if (nextFixtureIndex >= fixtures.size()) {
         teams = winners;
@@ -60,10 +61,11 @@ void Cup::simulateNextFixture() {
 
     f.homeGoals = match.getHomeGoals();
     f.awayGoals = match.getAwayGoals();
+    f.winner = match.winner();
     f.played = true;
 
     nextFixtureIndex++;
-    updateStanding(f, findTeam(f.home), findTeam(f.away));
+    updateStanding(f, findTeam(f.winner));
 }
 
 void Cup::simulateAll() {

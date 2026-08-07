@@ -12,7 +12,11 @@ Match::Match(Team home, Team away)
 void Match::printResult() const
 {
     std::cout << "\n===== Match Result =====\n"
-        << homeTeam.name << " " << homeGoals << " : " << awayGoals << " " << awayTeam.name << "\n";
+        << homeTeam.name << " " << homeGoals << " : " << awayGoals << " " << awayTeam.name;
+    if (decidedByPenalties) {
+        std::cout << "  (i.E. " << penaltyHomeGoals << ":" << penaltyAwayGoals << " " << winner() << ")";
+    }
+    std::cout << "\n";
 }
 //TODO: Verletzungen hinzufügen
 void Match::simulate(bool needWinner) {
@@ -27,9 +31,9 @@ void Match::simulate(bool needWinner) {
     }
 
     if (homeGoals == awayGoals && needWinner) {
+        extraTime = 0;
+        inExtraTime = false;
         for (int m = 1; m < 31; m++) {
-            inExtraTime = false;
-            extraTime = 0;
             simulateEvent(90 + m);
         }
         for (int e = 1; e <= extraTime; e++) {
@@ -37,9 +41,9 @@ void Match::simulate(bool needWinner) {
             simulateEvent(120,e);
         }
         if (homeGoals == awayGoals) {
+            decidedByPenalties = true;
             for (int m = 1; m <= 5; m++) {
                 if (penaltyShoot(rng) != 1) {
-                    homeGoals++;
                     penaltyHomeGoals++;
                     PenaltyShootoutGoalEvent(homeTeam.name, penaltyHomeGoals, penaltyAwayGoals);
                 }
@@ -47,7 +51,6 @@ void Match::simulate(bool needWinner) {
                     PenaltyShootoutMissEvent(homeTeam.name, penaltyHomeGoals, penaltyAwayGoals);
                 }
                 if (penaltyShoot(rng) != 1) {
-                    awayGoals++;
                     penaltyAwayGoals++;
                     PenaltyShootoutGoalEvent(awayTeam.name, penaltyHomeGoals, penaltyAwayGoals);
                 }
@@ -55,9 +58,8 @@ void Match::simulate(bool needWinner) {
                     PenaltyShootoutMissEvent(awayTeam.name, penaltyHomeGoals, penaltyAwayGoals);
                 }
             }
-            while (homeGoals == awayGoals) {
+            while (penaltyHomeGoals == penaltyAwayGoals) {
                 if (penaltyShoot(rng) != 1) {
-                    homeGoals++;
                     penaltyHomeGoals++;
                     PenaltyShootoutGoalEvent(homeTeam.name, penaltyHomeGoals, penaltyAwayGoals);
                 }
@@ -65,7 +67,6 @@ void Match::simulate(bool needWinner) {
                     PenaltyShootoutMissEvent(homeTeam.name, penaltyHomeGoals, penaltyAwayGoals);
                 }
                 if (penaltyShoot(rng) != 1) {
-                    awayGoals++;
                     penaltyAwayGoals++;
                     PenaltyShootoutGoalEvent(awayTeam.name, penaltyHomeGoals, penaltyAwayGoals);
                 }
@@ -116,4 +117,13 @@ void Match::processEvent(Team& team, Team& opponent, int& goals, int& players, i
             GoalEvent(minute, team.name, inExtraTime, eMinute);
         }
     }
+}
+
+std::string Match::winner() const {
+    if (decidedByPenalties) {
+        return penaltyHomeGoals > penaltyAwayGoals ? homeTeam.name : awayTeam.name;
+    }
+    if (homeGoals > awayGoals) return homeTeam.name;
+    if (awayGoals > homeGoals) return awayTeam.name;
+    return homeTeam.name;
 }

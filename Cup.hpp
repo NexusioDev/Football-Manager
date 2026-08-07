@@ -10,6 +10,7 @@
 struct CupFixture {
     std::string home;
     std::string away;
+    std::string winner;
     int homeGoals = 0;
     int awayGoals = 0;
     bool played = false;
@@ -46,5 +47,5 @@ private:
     std::map<std::string, CupStanding> table;
     size_t nextFixtureIndex = 0;
 
-    void updateStanding(const CupFixture& f, Team h, Team a);
+    void updateStanding(const CupFixture& f, Team w);
 };
