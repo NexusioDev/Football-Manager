@@ -18,6 +18,8 @@ add_executable(Football_Manager
         League.hpp
         Cup.cpp
         Cup.hpp
+        GameEngine.hpp
+        GameEngine.cpp
 )
 
 configure_file(

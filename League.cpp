@@ -3,29 +3,95 @@
 #include <iostream>
 #include <algorithm>
 #include <iomanip>
+#include <stdexcept>
 
-League::League(std::vector<Team> teamsIn, int amountRelegated, int amountRelPlayoff, int amountCl, int amountEl, int amountCfl) : teams(std::move(teamsIn)) {
+// FEHLERBEHEBUNG 1: amountRelegated NICHT mehr minus 1 rechnen!
+League::League(std::string nameIn, std::vector<Team> teamsIn, int amountRelegated, int amountRelPlayoff, int amountCl, int amountEl, int amountCfl)
+    : name(std::move(nameIn)),
+      teams(std::move(teamsIn)),
+      amountRelegationTeams(amountRelegated), // Korrigiert!
+      amountRelegationPlayoffTeams(amountRelPlayoff),
+      amountChampionsLeagueTeams(amountCl),
+      amountEuropaLeagueTeams(amountEl),
+      amountConferenceLeagueTeams(amountCfl)
+{
     for (const auto& t : teams) {
         table[t.name] = Standing{t.name};
     }
-    amountRelegationTeams = amountRelegated - 1;
-    amountRelegationPlayoffTeams = amountRelPlayoff;
-    amountChampionsLeagueTeams = amountCl;
-    amountEuropaLeagueTeams = amountEl;
-    amountConferenceLeagueTeams = amountCfl;
     generateFixtures();
+}
+
+Team League::findTeam(const std::string& teamName) const {
+    auto it = std::find_if(teams.begin(), teams.end(), [&](const Team& t) {
+        return t.name == teamName;
+    });
+    if (it == teams.end()) {
+        throw std::runtime_error("Team \"" + teamName + "\" nicht in Liga gefunden!");
+    }
+    return *it;
 }
 
 void League::generateFixtures() {
     fixtures.clear();
-    for (size_t i = 0; i < teams.size(); ++i) {
-        for (size_t j = 0; j < teams.size(); ++j) {
-            if (i != j) {
-                fixtures.push_back(Fixture{teams[i].name, teams[j].name});
+    if (teams.size() < 2) return;
+
+    std::vector<Team> tempTeams = teams;
+    if (tempTeams.size() % 2 != 0) {
+        tempTeams.push_back(Team{"BYE"});
+    }
+
+    size_t numTeams = tempTeams.size();
+    size_t numRounds = (numTeams - 1) * 2;
+    size_t matchesPerRound = numTeams / 2;
+
+    int currentDay = 1;
+
+    for (size_t round = 0; round < numRounds; ++round) {
+        for (size_t match = 0; match < matchesPerRound; ++match) {
+            size_t homeIdx = (round + match) % (numTeams - 1);
+            size_t awayIdx = (numTeams - 1 - match + round) % (numTeams - 1);
+
+            if (match == 0) {
+                awayIdx = numTeams - 1;
+            }
+
+            if (round >= numTeams - 1) {
+                std::swap(homeIdx, awayIdx);
+            }
+
+            std::string homeName = tempTeams[homeIdx].name;
+            std::string awayName = tempTeams[awayIdx].name;
+
+            if (homeName != "BYE" && awayName != "BYE") {
+                Fixture f;
+                f.home = homeName;
+                f.away = awayName;
+                f.date = "2026-08-" + (currentDay < 10 ? "0" + std::to_string(currentDay) : std::to_string(currentDay));
+                fixtures.push_back(f);
             }
         }
+        currentDay += 7;
     }
     nextFixtureIndex = 0;
+}
+
+void League::simulateFixturesForDate(const std::string& currentDate) {
+    for (auto& f : fixtures) {
+        if (!f.played && f.date == currentDate) {
+            Team homeTeam = findTeam(f.home);
+            Team awayTeam = findTeam(f.away);
+
+            Match match(homeTeam, awayTeam);
+            match.simulate();
+
+            f.homeGoals = match.getHomeGoals();
+            f.awayGoals = match.getAwayGoals();
+            f.played = true;
+
+            updateStanding(f);
+            nextFixtureIndex++; // FEHLERBEHEBUNG: Fortschritt auch bei Tages-Sim mitzählen!
+        }
+    }
 }
 
 void League::updateStanding(const Fixture& f) {
@@ -46,14 +112,6 @@ void League::simulateNextFixture() {
 
     Fixture& f = fixtures[nextFixtureIndex];
 
-    auto findTeam = [this](const std::string& name) {
-        auto it = std::find_if(teams.begin(), teams.end(), [&](const Team& t) {return t.name == name;});
-        if (it == teams.end()) {
-            throw std::runtime_error("Team \"" + name + "\" not found");
-        }
-        return *it;
-    };
-
     Match match(findTeam(f.home), findTeam(f.away));
     match.simulate();
 
@@ -63,6 +121,16 @@ void League::simulateNextFixture() {
 
     updateStanding(f);
     nextFixtureIndex++;
+}
+
+void League::simulateNextMatchday() {
+    if (isFinished() || teams.empty()) return;
+
+    size_t matchesPerMatchday = teams.size() / 2;
+    for (size_t i = 0; i < matchesPerMatchday; ++i) {
+        if (isFinished()) break;
+        simulateNextFixture();
+    }
 }
 
 void League::simulateAll() {
@@ -76,8 +144,15 @@ bool League::isFinished() const {
 }
 
 void League::printTable() const {
+    if (teams.empty() || table.empty()) {
+        std::cout << "\n[Hinweis] Keine Teams oder Tabellendaten vorhanden.\n";
+        return;
+    }
+
     std::vector<Standing> sorted;
-    for (const auto& [name, s] : table) sorted.push_back(s);
+    for (const auto& [teamName, s] : table) {
+        sorted.push_back(s);
+    }
 
     std::sort(sorted.begin(), sorted.end(), [](const Standing& a, const Standing& b) {
         if (a.points() != b.points()) return a.points() > b.points();
@@ -89,52 +164,64 @@ void League::printTable() const {
         sorted[i].pos = static_cast<int>(i) + 1;
     }
 
-    std::cout << "\n===== Tabelle =====\n";
+    int totalTeams = static_cast<int>(sorted.size());
+
+    // FEHLERBEHEBUNG 2: Exakte Grenzen für Abstieg und Relegation
+    int relStart = totalTeams - amountRelegationTeams + 1;
+    int relPlayoffStart = relStart - amountRelegationPlayoffTeams;
+
+    std::cout << "\n===== Tabelle (" << name << ") =====\n";
     std::cout << std::left << std::setw(4) << "Pos" << std::setw(28) << "Team"
-               << std::right << std::setw(4) << "Sp"
-               << std::setw(4) << "S" << std::setw(4) << "U" << std::setw(4) << "N"
-               << std::setw(7) << "Tore" << std::setw(6) << "Pkt" << "\n";
+              << std::right << std::setw(4) << "Sp"
+              << std::setw(4) << "S" << std::setw(4) << "U" << std::setw(4) << "N"
+              << std::setw(7) << "Tore" << std::setw(6) << "Pkt" << "\n";
 
     for (const auto& s : sorted) {
         std::string goals = std::to_string(s.gf) + ":" + std::to_string(s.ga);
 
         size_t len = 0;
-        for (unsigned char c : s.name)
-            if ((c & 0xC0) != 0x80)
-                ++len;
+        for (unsigned char c : s.name) {
+            if ((c & 0xC0) != 0x80) ++len;
+        }
 
-        int width = 28 + (s.name.size() - len);
+        int width = 28 + static_cast<int>(s.name.size() - len);
 
-        if (s.pos >= sorted.size() - amountRelegationTeams) {
-            std::cout << "\033[41m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
-                   << std::right << std::setw(4) << s.played
-                   << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
-                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
-        } else if (amountRelegationPlayoffTeams > 0 && s.pos == sorted.size() - amountRelegationTeams - amountRelegationPlayoffTeams) {
-            std::cout << "\033[43m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
-                   << std::right << std::setw(4) << s.played
-                   << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
-                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
+        if (s.pos >= relStart && amountRelegationTeams > 0) {
+            // Direkter Abstieg (Rot)
+            std::cout << "\033[41m" << std::left << std::setw(4) << s.pos << std::setw(width) << s.name
+                      << std::right << std::setw(4) << s.played
+                      << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
+                      << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
+        } else if (s.pos >= relPlayoffStart && s.pos < relStart && amountRelegationPlayoffTeams > 0) {
+            // Relegationsplatz (Gelb/Orange)
+            std::cout << "\033[43m" << std::left << std::setw(4) << s.pos << std::setw(width) << s.name
+                      << std::right << std::setw(4) << s.played
+                      << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
+                      << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
         } else if (s.pos <= amountChampionsLeagueTeams) {
-            std::cout << "\033[46m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
-                   << std::right << std::setw(4) << s.played
-                   << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
-                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
+            // Champions League
+            std::cout << "\033[46m" << std::left << std::setw(4) << s.pos << std::setw(width) << s.name
+                      << std::right << std::setw(4) << s.played
+                      << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
+                      << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
         } else if (s.pos <= amountChampionsLeagueTeams + amountEuropaLeagueTeams) {
-            std::cout << "\033[0;39;48;5;166m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
-                   << std::right << std::setw(4) << s.played
-                   << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
-                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
+            // Europa League
+            std::cout << "\033[0;39;48;5;166m" << std::left << std::setw(4) << s.pos << std::setw(width) << s.name
+                      << std::right << std::setw(4) << s.played
+                      << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
+                      << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
         } else if (s.pos <= amountChampionsLeagueTeams + amountEuropaLeagueTeams + amountConferenceLeagueTeams) {
-            std::cout << "\033[42m" <<std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
-                   << std::right << std::setw(4) << s.played
-                   << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
-                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
-        }else {
-            std::cout << std::left << std::setw(4) << s.pos <<std::setw(width) << s.name
-                       << std::right << std::setw(4) << s.played
-                       << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
-                       << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\n";
+            // Conference League
+            std::cout << "\033[42m" << std::left << std::setw(4) << s.pos << std::setw(width) << s.name
+                      << std::right << std::setw(4) << s.played
+                      << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
+                      << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\033[0m" << "\n";
+        } else {
+            // Normaler Platz
+            std::cout << std::left << std::setw(4) << s.pos << std::setw(width) << s.name
+                      << std::right << std::setw(4) << s.played
+                      << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
+                      << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\n";
         }
     }
 }
@@ -142,25 +229,15 @@ void League::printTable() const {
 void League::printFixtures() const {
     std::cout << "\n===== Spielplan =====\n";
     for (const auto& f : fixtures) {
-        std::cout << f.home << " vs " << f.away;
-        if (f.played) std::cout << "  ->  " << f.homeGoals << ":" << f.awayGoals;
+        std::cout << "[" << f.date << "] " << f.home << " vs. " << f.away;
+        if (f.played) {
+            std::cout << "  ->  " << f.homeGoals << ":" << f.awayGoals;
+        }
         std::cout << "\n";
     }
 }
 
 void League::printTableFixtures() const {
-    std::cout << "\n===== Spielplan =====\n";
-    std::string oldTeam = "/";
-
-    for (const auto& f : fixtures) {
-        if (f.home != oldTeam) {
-            std::cout << "\n" << std::left << std::setw(20) << f.home << ":";
-            if (f.played) std::cout << " -> " << f.homeGoals << ":" << f.awayGoals;
-        }
-        else if (f.home == oldTeam) {
-            if (f.played) std::cout << "; " << f.homeGoals << ":" << f.awayGoals;
-        }
-        oldTeam = f.home;
-    }
-    std::cout << "\n";
+    printTable();
+    printFixtures();
 }

@@ -3,69 +3,98 @@
 #include <iostream>
 #include <algorithm>
 #include <iomanip>
+#include <stdexcept>
 
 Cup::Cup(std::vector<Team> teamsIn) : teams(std::move(teamsIn)) {
-    for (const auto& t : teams) {
-        table[t.name] = CupStanding{t.name};
+    if (!teams.empty()) {
+        generateFixtures();
     }
-    generateFixtures();
 }
 
 void Cup::generateFixtures() {
     fixtures.clear();
-    std::shuffle(teams.begin(), teams.end(),rng);
-    for (int i = 0; i < teams.size(); i += 2) {
-        fixtures.push_back(CupFixture{teams[i].name, teams[i + 1].name});
-        fixtures.back().round = teams.size();
-    }
     nextFixtureIndex = 0;
-    for (int i = 0; i < fixtures.size(); ++i) {
-        std::cout << "\n" <<fixtures[i].home << " vs. " << fixtures[i].away;
-        if (i + 1 >= fixtures.size()) std::cout << "\n";
-    }
-}
 
-void Cup::updateStanding(const CupFixture& f, Team winner) {
-    /*CupStanding& home = table[f.home];
-    CupStanding& away = table[f.away];*/
-
-    /*if (f.homeGoals > f.awayGoals) {
-        winners.push_back(home);
+    // Wenn weniger als 2 Teams da sind, kann keine Runde mehr generiert werden
+    if (teams.size() < 2) {
+        return;
     }
-    else if (f.homeGoals < f.awayGoals) {
-        winners.push_back(away);
-    }*/
-    winners.push_back(winner);
 
-    if (nextFixtureIndex >= fixtures.size()) {
-        teams = winners;
-        winners.clear();
-        printFixtures();
-        historyFixtures.insert(historyFixtures.end(), fixtures.begin(), fixtures.end());
-        if (teams.size() >= 2) generateFixtures();
+    // Teams für zufällige Auslosung mischen
+    std::shuffle(teams.begin(), teams.end(), rng);
+
+    int currentRound = static_cast<int>(teams.size());
+
+    // Paarungen bilden (Immer 2 aufeinanderfolgende Teams gegeneinander)
+    for (size_t i = 0; i + 1 < teams.size(); i += 2) {
+        CupFixture f;
+        f.home = teams[i].name;
+        f.away = teams[i + 1].name;
+        f.round = currentRound;
+        f.played = false;
+        fixtures.push_back(f);
     }
+
+    winners.clear();
 }
 
 void Cup::simulateNextFixture() {
-    if (nextFixtureIndex >= fixtures.size()) return;
+    // 1. Sichere Abbruchbedingung gegen Leere Vektoren / Falsche Indizes
+    if (fixtures.empty() || nextFixtureIndex >= fixtures.size()) {
+        return;
+    }
 
-    CupFixture& f = fixtures[nextFixtureIndex];
+    // Nutzen von .at() wirft eine Exception statt eines Debug-Assertion-Crashes
+    CupFixture& f = fixtures.at(nextFixtureIndex);
 
-    auto findTeam = [this](const std::string& name) {
-        return *std::find_if(teams.begin(), teams.end(),
-            [&](const Team& t) { return t.name == name; });
+    auto findTeam = [this](const std::string& teamName) {
+        auto it = std::find_if(teams.begin(), teams.end(), [&](const Team& t) {
+            return t.name == teamName;
+        });
+        if (it == teams.end()) {
+            throw std::runtime_error("Team im Pokal nicht gefunden: " + teamName);
+        }
+        return *it;
     };
 
-    Match match(findTeam(f.home), findTeam(f.away));
-    match.simulate(true);
+    Team homeTeam = findTeam(f.home);
+    Team awayTeam = findTeam(f.away);
+
+    Match match(homeTeam, awayTeam);
+    match.simulate();
 
     f.homeGoals = match.getHomeGoals();
     f.awayGoals = match.getAwayGoals();
-    f.winner = match.winner();
+
+    // Pokal-Verlängerung/Elfmeterschießen bei Unentschieden
+    if (f.homeGoals == f.awayGoals) {
+        std::uniform_int_distribution<int> dist(0, 1);
+        if (dist(rng) == 0) {
+            f.homeGoals++;
+        } else {
+            f.awayGoals++;
+        }
+    }
+
     f.played = true;
 
+    // Sieger ermitteln und für die nächste Runde speichern
+    if (f.homeGoals > f.awayGoals) {
+        f.winner = f.home;
+        winners.push_back(homeTeam);
+    } else {
+        f.winner = f.away;
+        winners.push_back(awayTeam);
+    }
+
+    historyFixtures.push_back(f);
     nextFixtureIndex++;
-    updateStanding(f, findTeam(f.winner));
+
+    // 2. Wenn alle Spiele der aktuellen Runde vorbei sind -> Nächste Runde vorbereiten!
+    if (nextFixtureIndex >= fixtures.size()) {
+        teams = winners; // Die Sieger rücken in die nächste Runde auf
+        generateFixtures(); // Erstellt die nächsten Paarungen
+    }
 }
 
 void Cup::simulateAll() {
@@ -75,79 +104,33 @@ void Cup::simulateAll() {
 }
 
 bool Cup::isFinished() const {
-    return teams.size() == 1;
+    // Der Pokal ist erst vorbei, wenn nur noch 1 Gewinner übrig ist und keine Spiele mehr anstehen
+    return teams.size() <= 1 && (fixtures.empty() || nextFixtureIndex >= fixtures.size());
 }
 
-/*void Cup::printTable() const {
-    std::vector<CupStanding> sorted;
-    for (const auto& [name, s] : table) sorted.push_back(s);
-
-    std::sort(sorted.begin(), sorted.end(), [](const CupStanding& a, const CupStanding& b) {
-        if (a.points() != b.points()) return a.points() > b.points();
-        if (a.gd() != b.gd()) return a.gd() > b.gd();
-        return a.gf > b.gf;
-    });
-
-    for (size_t i = 0; i < sorted.size(); ++i) {
-        sorted[i].pos = static_cast<int>(i) + 1;
+std::string Cup::roundName(int teamCount) const {
+    switch (teamCount) {
+        case 2: return "Finale";
+        case 4: return "Halbfinale";
+        case 8: return "Viertelfinale";
+        case 16: return "Achtelfinale";
+        default: return "Runde der letzten " + std::to_string(teamCount);
     }
-
-    std::cout << "\n===== Tabelle =====\n";
-    std::cout << std::left << std::setw(4) << "Pos" << std::setw(20) << "Team"
-               << std::right << std::setw(4) << "Sp"
-               << std::setw(4) << "S" << std::setw(4) << "U" << std::setw(4) << "N"
-               << std::setw(7) << "Tore" << std::setw(6) << "Pkt" << "\n";
-
-    for (const auto& s : sorted) {
-        std::string goals = std::to_string(s.gf) + ":" + std::to_string(s.ga);
-
-        std::cout << std::left << std::setw(4) << s.pos <<std::setw(20) << s.name
-                   << std::right << std::setw(4) << s.played
-                   << std::setw(4) << s.won << std::setw(4) << s.drawn << std::setw(4) << s.lost
-                   << std::setw(8) << goals << std::right << std::setw(5) << s.points() << "\n";
-    }
-}*/
+}
 
 void Cup::printFixtures() const {
-    std::cout << "\n===== Spielplan =====\n";
-    for (const auto& f : fixtures) {
-        std::cout << f.home << " vs " << f.away;
-        if (f.played) std::cout << "  ->  " << f.homeGoals << ":" << f.awayGoals;
-        std::cout << "\n";
+    std::cout << "\n===== Pokal Spiele =====\n";
+    for (const auto& f : historyFixtures) {
+        std::cout << "[" << roundName(f.round) << "] "
+                  << f.home << " " << f.homeGoals << ":" << f.awayGoals << " " << f.away
+                  << " (Sieger: " << f.winner << ")\n";
     }
 }
 
 void Cup::printCupFixtures() const {
-    std::cout << "\n===== Turnier Verlauf =====\n";
-    int oldRound = 0;
-
-    for (const auto& f : historyFixtures) {
-        if (f.round != oldRound) {
-            std::cout << "\n===== " << roundName(f.round) << " =====\n";
-            std::cout << f.home << " vs " << f.away;
-            if (f.played) std::cout << "  ->  " << f.homeGoals << ":" << f.awayGoals;
-            std::cout << "\n";
-            //if (f.played) std::cout << " -> " << f.homeGoals << ":" << f.awayGoals;
-        }
-        else if (f.round == oldRound) {
-            //if (f.played) std::cout << "; " << f.homeGoals << ":" << f.awayGoals;
-            std::cout << f.home << " vs " << f.away;
-            if (f.played) std::cout << "  ->  " << f.homeGoals << ":" << f.awayGoals;
-            std::cout << "\n";
-        }
-        oldRound = f.round;
-    }
-    std::cout << "\n" << teams[0].name << " has won the cup!" << "\n";
+    printFixtures();
 }
 
-std::string Cup::roundName(int teams) const
-{
-    switch (teams)
-    {
-        case 2:  return "Finale";
-        case 4:  return "Halbfinale";
-        case 8:  return "Viertelfinale";
-        case 16: return "Achtelfinale";
-        default: return "Runde der " + std::to_string(teams);
-    }
+void Cup::updateStanding(const CupFixture& f, Team w) {
+    // Bisher ungenutzt / Platzhalter
 }

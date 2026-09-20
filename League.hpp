@@ -11,6 +11,7 @@ struct Fixture {
     int homeGoals = 0;
     int awayGoals = 0;
     bool played = false;
+    std::string date;
 };
 
 struct Standing {
@@ -25,27 +26,56 @@ struct Standing {
 
 class League {
 public:
-    explicit League(std::vector<Team> teams, int amountRelegationTeams, int amountRelPlayoffTeams = 0, int amountClTeams = 0, int amountElTeams = 0, int amountCflTeams = 0);
+    League() = default;
 
-    void generateFixtures();       // Hin- und Rückrunde
-    void simulateNextFixture();    // ein einzelnes Spiel
-    void simulateAll();            // alle verbleibenden Spiele
+    explicit League(std::string nameIn, std::vector<Team> teamsIn,
+                   int amountRelegated, int amountRelPlayoff = 0,
+                   int amountCl = 0, int amountEl = 0, int amountCfl = 0);
+
+    void generateFixtures();
+    void simulateFixturesForDate(const std::string& currentDate);
+    void simulateNextFixture();
+    void simulateNextMatchday();
+    void simulateAll();
 
     bool isFinished() const;
     void printTable() const;
     void printFixtures() const;
     void printTableFixtures() const;
 
+    // Getter & Setter für GameEngine (Speichern/Laden & Status)
+    std::string getName() const { return name; }
+    const std::vector<Team>& getTeams() const { return teams; }
+
+    size_t getNextFixtureIndex() const { return nextFixtureIndex; }
+    void setNextFixtureIndex(size_t idx) { nextFixtureIndex = idx; }
+
+    int getAmountRelegationTeams() const { return amountRelegationTeams; }
+    int getAmountRelegationPlayoffTeams() const { return amountRelegationPlayoffTeams; }
+    int getAmountChampionsLeagueTeams() const { return amountChampionsLeagueTeams; }
+    int getAmountEuropaLeagueTeams() const { return amountEuropaLeagueTeams; }
+    int getAmountConferenceLeagueTeams() const { return amountConferenceLeagueTeams; }
+
+    const std::map<std::string, Standing>& getTable() const { return table; }
+    void setTable(const std::map<std::string, Standing>& newTable) { table = newTable; }
+
+    int getCurrentMatchday() const {
+        if (teams.empty()) return 1;
+        return static_cast<int>(nextFixtureIndex / (teams.size() / 2)) + 1;
+    }
+
 private:
+    std::string name;
     std::vector<Team> teams;
     std::vector<Fixture> fixtures;
     std::map<std::string, Standing> table;
     size_t nextFixtureIndex = 0;
-    int amountRelegationTeams;
-    int amountRelegationPlayoffTeams;
-    int amountChampionsLeagueTeams;
-    int amountEuropaLeagueTeams;
-    int amountConferenceLeagueTeams;
+    int amountRelegationTeams = 0;
+    int amountRelegationPlayoffTeams = 0;
+    int amountChampionsLeagueTeams = 0;
+    int amountEuropaLeagueTeams = 0;
+    int amountConferenceLeagueTeams = 0;
 
     void updateStanding(const Fixture& f);
+    Team findTeam(const std::string& teamName) const;
 };

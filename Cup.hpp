@@ -24,6 +24,7 @@ struct CupStanding {
 
 class Cup {
 public:
+    Cup() = default;
     explicit Cup(std::vector<Team> teams);
 
     void generateFixtures();       // Hin- und Rückrunde
