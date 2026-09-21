@@ -37,6 +37,7 @@ int main() {
     }
 
     while (true) {
+        engine.printCurrentDate();
         std::cout << "\n=== Hauptmenue ===\n"
                   << "1) Ligen & Tabellen anzeigen\n"
                   << "2) Naechsten Spieltag simulieren (Alle Ligen!)\n"

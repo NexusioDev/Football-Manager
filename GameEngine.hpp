@@ -24,6 +24,7 @@ public:
     // Tagesbasierte Simulation & Datumsfortschritt
     void simulateCurrentDay();
     void advanceDateByOneDay();
+    void printCurrentDate();
 
     // Speichern und Laden der gesamten Spielwelt
     void saveWorld(const std::string& savePath, nlohmann::json& teamsData) const;

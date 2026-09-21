@@ -69,6 +69,8 @@ void GameEngine::advanceMatchday() {
             std::cout << "-> " << name << ": Saison beendet.\n";
         }
     }
+
+    advanceDateByOneDay();
 }
 
 League* GameEngine::getLeague(const std::string& name) {
@@ -191,24 +193,35 @@ void GameEngine::simulateCurrentDay() {
 }
 
 void GameEngine::advanceDateByOneDay() {
-    int year, month, day;
-    char dash1, dash2;
+    std::tm timeInfo = {};
     std::stringstream ss(currentDate);
-    ss >> year >> dash1 >> month >> dash2 >> day;
 
-    day++;
-    if (day > 30) { // Vereinfachte Monatslogik
-        day = 1;
-        month++;
-        if (month > 12) {
-            month = 1;
-            year++;
-        }
+    ss >> std::get_time(&timeInfo, "%Y-%m-%d");
+
+    if (ss.fail())
+    {
+        std::cerr << "Fehler: Datum konnte nicht geladen werden: " << currentDate << std::endl;
+        return;
     }
 
+    timeInfo.tm_mday += 1;
+
+    if (std::mktime(&timeInfo) == -1) {
+        std::cerr << "Fehler bei der Datumsberechnung für: " << currentDate << std::endl;
+        return;
+    }
+
+    // Zurück in den String formatieren (garantiert immer YYYY-MM-DD mit führenden Nullen)
     std::stringstream newDate;
-    newDate << year << "-"
-            << std::setfill('0') << std::setw(2) << month << "-"
-            << std::setfill('0') << std::setw(2) << day;
+    newDate << std::put_time(&timeInfo, "%Y-%m-%d");
     currentDate = newDate.str();
+}
+
+void GameEngine::printCurrentDate() {
+    // Wandelt "2026-08-01" um in "01.08.2026" nur für die Anzeige
+    std::string y = currentDate.substr(0, 4);
+    std::string m = currentDate.substr(5, 2);
+    std::string d = currentDate.substr(8, 2);
+
+    std::cout << "\n" << "Aktuelles Datum: " << d << "." << m << "." << y << "\n" << std::endl;
 }
