@@ -30,7 +30,7 @@ public:
 
     explicit League(std::string nameIn, std::vector<Team> teamsIn,
                    int amountRelegated, int amountRelPlayoff = 0,
-                   int amountCl = 0, int amountEl = 0, int amountCfl = 0);
+                   int amountCl = 0, int amountEl = 0, int amountCfl = 0, std::string above = "", std::string below = "");
 
     void generateFixtures();
     void simulateFixturesForDate(const std::string& currentDate);
@@ -39,13 +39,22 @@ public:
     void simulateAll();
 
     bool isFinished() const;
+    std::vector<Standing> getSortedTable() const;
+    std::vector<Team> getRelegatedTeams() const;
+    std::vector<Team> getPromotedTeams(int amountPromoted) const;
+    std::string getLeagueAbove() const { return leagueAbove; }
+    std::string getLeagueBelow() const { return leagueBelow; }
+    void resetForNewSeason(const std::vector<Team>& newTeams);
     void printTable() const;
     void printFixtures() const;
     void printTableFixtures() const;
+    Team getRelegationPlayoffTeam() const;
+    Team getThirdPlaceTeam() const;
 
     // Getter & Setter für GameEngine (Speichern/Laden & Status)
     std::string getName() const { return name; }
     const std::vector<Team>& getTeams() const { return teams; }
+    void setTeams(const std::vector<Team>& newTeams) { teams = newTeams; }
 
     size_t getNextFixtureIndex() const { return nextFixtureIndex; }
     void setNextFixtureIndex(size_t idx) { nextFixtureIndex = idx; }
@@ -63,9 +72,12 @@ public:
         if (teams.empty()) return 1;
         return static_cast<int>(nextFixtureIndex / (teams.size() / 2)) + 1;
     }
+    Team findTeam(const std::string& teamName) const;
 
 private:
     std::string name;
+    std::string leagueAbove;
+    std::string leagueBelow;
     std::vector<Team> teams;
     std::vector<Fixture> fixtures;
     std::map<std::string, Standing> table;
@@ -77,5 +89,4 @@ private:
     int amountConferenceLeagueTeams = 0;
 
     void updateStanding(const Fixture& f);
-    Team findTeam(const std::string& teamName) const;
 };

@@ -38,6 +38,16 @@ int main() {
 
     while (true) {
         engine.printCurrentDate();
+
+        if (engine.areAllLeaguesFinished()) {
+            std::cout << "\nAlle Spiele der aktuellen Saison sind absolviert!\n";
+            std::cout << "Möchtest du die neue Saison starten? (y/n): ";
+            char choice;
+            std::cin >> choice;
+            if (choice == 'y' || choice == 'Y') {
+                engine.startNextSeason();
+            }
+        }
         std::cout << "\n=== Hauptmenue ===\n"
                   << "1) Ligen & Tabellen anzeigen\n"
                   << "2) Naechsten Spieltag simulieren (Alle Ligen!)\n"

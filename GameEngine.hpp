@@ -8,6 +8,12 @@
 #include "Team.hpp"
 #include "League.hpp"
 #include "Cup.hpp"
+#include "Match.hpp"
+
+struct RelegationResult {
+    Team winner;
+    Team loser;
+};
 
 class GameEngine {
 public:
@@ -39,6 +45,11 @@ public:
     
     // Hilfsmethode, um eine spezifische Liga zu holen
     League* getLeague(const std::string& name);
+
+    bool areAllLeaguesFinished() const;
+    RelegationResult simulateRelegationPlayoff(const League& higherLeague, const League& lowerLeague);
+    void startNextSeasonWithPlayoffs();
+    void startNextSeason();
 
 private:
     std::map<std::string, League> leagues;

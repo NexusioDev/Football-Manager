@@ -5,15 +5,15 @@
 #include <iomanip>
 #include <stdexcept>
 
-// FEHLERBEHEBUNG 1: amountRelegated NICHT mehr minus 1 rechnen!
-League::League(std::string nameIn, std::vector<Team> teamsIn, int amountRelegated, int amountRelPlayoff, int amountCl, int amountEl, int amountCfl)
+League::League(std::string nameIn, std::vector<Team> teamsIn, int amountRelegated, int amountRelPlayoff, int amountCl, int amountEl, int amountCfl, std::string above, std::string below)
     : name(std::move(nameIn)),
       teams(std::move(teamsIn)),
       amountRelegationTeams(amountRelegated), // Korrigiert!
       amountRelegationPlayoffTeams(amountRelPlayoff),
       amountChampionsLeagueTeams(amountCl),
       amountEuropaLeagueTeams(amountEl),
-      amountConferenceLeagueTeams(amountCfl)
+      amountConferenceLeagueTeams(amountCfl),
+        leagueAbove(std::move(above)), leagueBelow(std::move(below))
 {
     for (const auto& t : teams) {
         table[t.name] = Standing{t.name};
@@ -143,6 +143,51 @@ bool League::isFinished() const {
     return nextFixtureIndex >= fixtures.size();
 }
 
+std::vector<Standing> League::getSortedTable() const {
+    std::vector<Standing> sorted;
+    for (const auto& [teamName, s] : table) {
+        sorted.push_back(s);
+    }
+    std::sort(sorted.begin(), sorted.end(), [](const Standing& a, const Standing& b) {
+        if (a.points() != b.points()) return a.points() > b.points();
+        if (a.gd() != b.gd()) return a.gd() > b.gd();
+        return a.gf > b.gf;
+    });
+    return sorted;
+}
+
+std::vector<Team> League::getRelegatedTeams() const {
+    std::vector<Team> result;
+    auto sortedTable = getSortedTable();
+
+    // Holt genau die letzten 'amountRelegationTeams' Plätze (z.B. 2 -> Platz 17 und 18 bei 18 Teams)
+    int total = sortedTable.size();
+    for (int i = total - amountRelegationTeams; i < total; ++i) {
+        result.push_back(findTeam(sortedTable[i].name));
+    }
+    return result;
+}
+
+// Für Aufsteiger nutzen wir die ersten N Plätze (ohne Platz 1 wenn Meister anders gezählt wird)
+std::vector<Team> League::getPromotedTeams(int amountPromoted) const {
+    auto sorted = getSortedTable();
+    std::vector<Team> promoted;
+
+    for (int i = 0; i < amountPromoted && i < sorted.size(); ++i) {
+        promoted.push_back(findTeam(sorted[i].name));
+    }
+    return promoted;
+}
+
+void League::resetForNewSeason(const std::vector<Team>& newTeams) {
+    teams = newTeams;
+    table.clear();
+    for (const auto& t : teams) {
+        table[t.name] = Standing{t.name};
+    }
+    generateFixtures();
+}
+
 void League::printTable() const {
     if (teams.empty() || table.empty()) {
         std::cout << "\n[Hinweis] Keine Teams oder Tabellendaten vorhanden.\n";
@@ -240,4 +285,27 @@ void League::printFixtures() const {
 void League::printTableFixtures() const {
     printTable();
     printFixtures();
+}
+
+// In League.cpp ganz unten anfügen:
+Team League::getRelegationPlayoffTeam() const {
+    auto sortedTable = getSortedTable();
+    int total = static_cast<int>(sortedTable.size());
+
+    // Berechne Exakt die Relegationsposition (z.B. Index 15 bei 18 Teams -> Platz 16)
+    int relStart = total - amountRelegationTeams; // z.B. 18 - 2 = 16 (Index 16 & 17)
+    int relPlayoffIndex = relStart - amountRelegationPlayoffTeams; // 16 - 1 = Index 15 (Platz 16)
+
+    if (relPlayoffIndex >= 0 && relPlayoffIndex < total) {
+        return findTeam(sortedTable[relPlayoffIndex].name);
+    }
+    throw std::runtime_error("Kein Relegationsplatz in Liga " + name + " definiert!");
+}
+
+Team League::getThirdPlaceTeam() const {
+    auto sortedTable = getSortedTable();
+    if (sortedTable.size() >= 3) {
+        return findTeam(sortedTable[2].name); // Platz 3 (Index 2)
+    }
+    throw std::runtime_error("Nicht genügend Teams für Platz 3 in " + name);
 }

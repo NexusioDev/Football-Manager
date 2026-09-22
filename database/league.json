@@ -49,6 +49,7 @@
       "VfB Stuttgart",
       "Werder Bremen"
     ],
+    "below": "2. Bundesliga",
     "amountChampionsLeagueTeams": 5,
     "amountEuropaLeagueTeams": 1,
     "amountConferenceLeagueTeams": 1,
@@ -76,6 +77,8 @@
       "VfL Osnabrück",
       "VfL Wolfsburg"
     ],
+    "above": "Bundesliga",
+    "below": "3. Liga",
     "amountEuropaLeagueTeams": 2,
     "amountConferenceLeagueTeams": 1,
     "amountRelegationPlayoffTeams": 1,
@@ -104,6 +107,7 @@
       "SV Waldhof Mannheim",
       "Würzburger Kickers"
     ],
+    "above": "2. Bundesliga",
     "amountEuropaLeagueTeams": 2,
     "amountConferenceLeagueTeams": 1,
     "amountRelegationTeams": 4
